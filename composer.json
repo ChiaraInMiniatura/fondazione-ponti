@@ -1,0 +1,46 @@
+{
+    "name": "bluelabs/bluelabs-esercizio",
+    "type": "project",
+    "license": "MIT",
+    "description": "Progetto di esercitazione basato su Bedrock — struttura WordPress moderna",
+    "homepage": "https://roots.io/bedrock/",
+    "keywords": ["bedrock", "composer", "roots", "wordpress", "wp", "wp-config"],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://wpackagist.org",
+            "only": [
+                "wpackagist-plugin/*",
+                "wpackagist-theme/*"
+            ]
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "composer/installers": "^2.1",
+        "vlucas/phpdotenv": "^5.5",
+        "oscarotero/env": "^2.1",
+        "roots/bedrock-autoloader": "^1.0",
+        "roots/wordpress": "^6.5",
+        "roots/wp-config": "^1.0",
+        "roots/wp-password-bcrypt": "^1.1"
+    },
+    "extra": {
+        "installer-paths": {
+            "web/app/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+            "web/app/plugins/{$name}/": ["type:wordpress-plugin"],
+            "web/app/themes/{$name}/": ["type:wordpress-theme"]
+        },
+        "wordpress-install-dir": "web/wp"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "allow-plugins": {
+            "composer/installers": true,
+            "roots/wordpress-core-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
