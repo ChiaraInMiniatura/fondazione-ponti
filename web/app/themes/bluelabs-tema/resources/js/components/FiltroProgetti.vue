@@ -1,102 +1,78 @@
+<!--
+  Filtro Progetti per area di intervento — Fase 4.
+
+  Nota di progetto: questo componente NON rifà una fetch REST dei progetti.
+  L'archivio (/progetti/) è già interamente renderizzato da WordPress/Blade
+  — resta funzionante anche senza JavaScript. Vue si monta solo su questo
+  elemento (#filtro-progetti, vedi archive-progetto.blade.php) e si limita
+  a mostrare/nascondere le card già presenti nel DOM, leggendo l'attributo
+  data-aree impostato da partials/content-progetto.blade.php su ciascuna
+  card. Un secondo endpoint REST per lo stesso identico dato sarebbe stato
+  ridondante con quello che il server ha già prodotto in HTML.
+-->
 <script setup>
-// Composition API. Equivalenze rapide con React:
-//   ref()       ~ useState
-//   computed()  ~ useMemo
-//   onMounted() ~ useEffect(() => {...}, [])
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 
-const progetti = ref([]);
-const caricamento = ref(true);
-const errore = ref(null);
-const areaAttiva = ref(null); // null = "Tutti"
+const mountEl = document.getElementById('filtro-progetti');
 
-// Le aree di intervento non sono una lista fissa scritta a mano: le
-// deriviamo dai progetti stessi, così se in wp-admin aggiungi una nuova
-// area il filtro si aggiorna da solo, senza toccare il codice.
-const aree = computed(() => {
-  const viste = new Map();
-  for (const progetto of progetti.value) {
-    for (const termine of progetto._embedded?.['wp:term']?.[0] ?? []) {
-      viste.set(termine.slug, termine.name);
-    }
+const aree = ref([]);
+try {
+  aree.value = mountEl ? JSON.parse(mountEl.dataset.aree || '[]') : [];
+} catch (errore) {
+  console.error('FiltroProgetti: dati delle aree non leggibili.', errore);
+  aree.value = [];
+}
+
+const filtroAttivo = ref('tutti');
+
+const totaleProgetti = computed(
+  () => document.querySelectorAll('#griglia-progetti > article').length
+);
+
+function applicaFiltro(slug) {
+  filtroAttivo.value = slug;
+
+  const card = document.querySelectorAll('#griglia-progetti > article');
+  const messaggioVuoto = document.getElementById('filtro-progetti-vuoto');
+  let visibili = 0;
+
+  card.forEach((el) => {
+    const areeCard = (el.dataset.aree || '').split(' ').filter(Boolean);
+    const corrisponde = slug === 'tutti' || areeCard.includes(slug);
+    el.classList.toggle('hidden', ! corrisponde);
+    if (corrisponde) visibili += 1;
+  });
+
+  if (messaggioVuoto) {
+    messaggioVuoto.classList.toggle('hidden', visibili > 0);
   }
-  return Array.from(viste, ([slug, nome]) => ({ slug, nome }));
-});
-
-const progettiFiltrati = computed(() => {
-  if (!areaAttiva.value) return progetti.value;
-  return progetti.value.filter((progetto) =>
-    (progetto._embedded?.['wp:term']?.[0] ?? []).some(
-      (termine) => termine.slug === areaAttiva.value
-    )
-  );
-});
-
-onMounted(async () => {
-  try {
-    // _embed=true fa sì che la risposta includa già i termini di tassonomia
-    // (area_intervento) e l'immagine in evidenza, senza dover fare una
-    // seconda chiamata API per ciascun progetto.
-    const risposta = await fetch('/wp-json/wp/v2/progetto?per_page=50&_embed=true');
-    if (!risposta.ok) throw new Error(`Errore HTTP ${risposta.status}`);
-    progetti.value = await risposta.json();
-  } catch (e) {
-    errore.value = e.message;
-  } finally {
-    caricamento.value = false;
-  }
-});
-
-function copertina(progetto) {
-  return progetto._embedded?.['wp:featuredmedia']?.[0]?.source_url ?? null;
 }
 </script>
 
 <template>
-  <div class="filtro-progetti">
-    <div class="flex flex-wrap gap-2 mb-6">
-      <button
-        type="button"
-        class="px-3 py-1 rounded-full border"
-        :class="areaAttiva === null ? 'bg-black text-white' : 'bg-white'"
-        @click="areaAttiva = null"
-      >
-        Tutti
-      </button>
-      <button
-        v-for="area in aree"
-        :key="area.slug"
-        type="button"
-        class="px-3 py-1 rounded-full border"
-        :class="areaAttiva === area.slug ? 'bg-black text-white' : 'bg-white'"
-        @click="areaAttiva = area.slug"
-      >
-        {{ area.nome }}
-      </button>
-    </div>
+  <div v-if="aree.length" class="flex flex-wrap gap-2.5" role="group" aria-label="Filtra per area di intervento">
+    <button
+      type="button"
+      class="rounded-lg border px-4 py-2 text-sm font-semibold transition-colors"
+      :class="filtroAttivo === 'tutti'
+        ? 'border-bridge bg-bridge/5 text-bridge'
+        : 'border-line hover:border-bridge hover:text-bridge'"
+      @click="applicaFiltro('tutti')"
+    >
+      Tutti ({{ totaleProgetti }})
+    </button>
 
-    <p v-if="caricamento">Caricamento progetti...</p>
-    <p v-else-if="errore">Errore nel caricamento: {{ errore }}</p>
-    <p v-else-if="progettiFiltrati.length === 0">Nessun progetto in questa area.</p>
-
-    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <a
-        v-for="progetto in progettiFiltrati"
-        :key="progetto.id"
-        :href="progetto.link"
-        class="border rounded overflow-hidden block"
-      >
-        <img
-          v-if="copertina(progetto)"
-          :src="copertina(progetto)"
-          class="w-full h-40 object-cover"
-          alt=""
-        />
-        <div class="p-3">
-          <h3 class="font-bold" v-html="progetto.title.rendered"></h3>
-          <div class="text-sm text-gray-600" v-html="progetto.excerpt.rendered"></div>
-        </div>
-      </a>
-    </div>
+    <button
+      v-for="area in aree"
+      :key="area.slug"
+      type="button"
+      class="rounded-lg border px-4 py-2 text-sm font-semibold transition-colors"
+      :class="filtroAttivo === area.slug
+        ? 'border-bridge bg-bridge/5 text-bridge'
+        : 'border-line hover:border-bridge hover:text-bridge'"
+      @click="applicaFiltro(area.slug)"
+    >
+      {{ area.name }} ({{ area.count }})
+    </button>
   </div>
 </template>

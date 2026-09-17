@@ -42,7 +42,7 @@ add_action('after_setup_theme', function () {
  * si limitano a chiamare add_action()/add_filter() a livello di file).
  * Vanno richiesti esplicitamente, come fa lo scaffold ufficiale di Sage.
  */
-collect(['setup', 'filters', 'cpt'])
+collect(['setup', 'filters', 'cpt', 'candidature'])
     ->each(function ($file) {
         if (! locate_template($file = "app/{$file}.php", true, true)) {
             wp_die(

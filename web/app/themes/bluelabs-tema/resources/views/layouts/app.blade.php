@@ -9,22 +9,22 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
   </head>
 
-  <body @php(body_class())>
+  <body @php(body_class('flex min-h-screen flex-col'))>
     @php(wp_body_open())
 
-    <div id="app">
+    <div id="app" class="flex min-h-screen flex-col">
       <a class="sr-only focus:not-sr-only" href="#main">
         {{ __('Skip to content', 'sage') }}
       </a>
 
       @include('sections.header')
 
-      <main id="main" class="main">
+      <main id="main" class="flex-1">
         @yield('content')
       </main>
 
       @hasSection('sidebar')
-        <aside class="sidebar">
+        <aside class="mx-auto w-full max-w-[1120px] px-6 py-12">
           @yield('sidebar')
         </aside>
       @endif

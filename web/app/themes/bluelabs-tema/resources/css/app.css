@@ -1,4 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Public+Sans:wght@400;500;600;700&display=swap');
 @import "tailwindcss" theme(static);
+@plugin "@tailwindcss/typography";
+
+/**
+ * Design system "Fondazione Ponti" — token di colore e tipografia.
+ * Definendoli qui (Tailwind v4, CSS-first) diventano automaticamente
+ * classi utility: bg-ink, text-bridge, border-line, font-display, ecc.
+ * Vengono anche letti da @roots/vite-plugin (wordpressThemeJson) per
+ * generare la palette colori dell'editor a blocchi di WordPress.
+ */
+@theme {
+  --color-ink: #16232f;
+  --color-bridge: #2e5266;
+  --color-bridge-dark: #1d3a48;
+  --color-dawn: #c96a2e;
+  --color-dawn-deep: #a24f1e;
+  --color-paper: #eef1f0;
+  --color-surface: #ffffff;
+  --color-line: rgba(22, 35, 47, 0.13);
+  --color-muted: #52707a;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Public Sans", system-ui, sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(22, 35, 47, 0.06), 0 8px 24px rgba(22, 35, 47, 0.05);
+}
+
+@layer base {
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+@utility lede {
+  color: var(--color-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 60ch;
+}
+
+@utility eyebrow {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-bridge);
+}
+
 @source "../../app/**/*.php";
 @source "../**/*.blade.php";
 @source "../**/*.js";

@@ -1,9 +1,5 @@
 {{--
     Pagina di un singolo progetto — /progetti/nome-progetto/
-
-    Speculare a single.blade.php, ma dedicata al CPT "progetto" grazie
-    alla convenzione "single-{post_type}.blade.php": WordPress la sceglie
-    automaticamente al posto di quella generica.
 --}}
 @extends('layouts.app')
 
@@ -12,7 +8,9 @@
     @include('partials.content-single-progetto')
 
     @if (comments_open() || get_comments_number())
-      @include('partials.comments')
+      <div class="mx-auto max-w-[760px] px-6 pb-16">
+        @include('partials.comments')
+      </div>
     @endif
   @endwhile
 @endsection
