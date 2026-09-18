@@ -1,20 +1,59 @@
 # Fondazione Ponti
 
-Sito WordPress per **Fondazione Ponti**, una fondazione umanitaria fittizia
-(Napoli). È un progetto di pratica personale, costruito per allenarmi su uno
-stack WordPress moderno prima di un incarico vero per un'agenzia — non è un
-sito in produzione e non ha uno scopo commerciale reale.
+![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php&logoColor=white)
+![WordPress](https://img.shields.io/badge/WordPress-Bedrock-21759B?logo=wordpress&logoColor=white)
+![Vue](https://img.shields.io/badge/Vue-3-4FC08D?logo=vuedotjs&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?logo=vite&logoColor=white)
 
-## Stack
+Sito per una fondazione umanitaria fittizia (Napoli). Progetto di pratica
+personale, costruito per allenarmi prima di un incarico vero per un'agenzia:
+non è online, non ha uno scopo commerciale reale.
 
-- **[Bedrock](https://roots.io/bedrock/)** — struttura WordPress moderna, gestita via Composer, con configurazione a variabili d'ambiente
-- **[Sage](https://roots.io/sage/) + [Acorn](https://roots.io/acorn/)** — tema con Blade come motore di template e integrazione Laravel-style
-- **Blade** — template del tema
-- **Tailwind CSS v4** — design system a token via `@theme` (colori, font, ombre), utility classes
-- **Vite** — build/dev server per asset CSS/JS del tema
-- **Vue 3** — componenti isolati montati su porzioni specifiche di pagina (niente SPA: il resto è HTML renderizzato da WordPress/Blade)
+<!-- screenshot / GIF della homepage e del filtro progetti qui -->
 
-## Struttura del progetto
+## Cosa fa
+
+- **Archivio progetti filtrabile** per area di intervento (Salute, Infanzia,
+  Ambiente), senza ricaricare la pagina.
+- **Pagina progetto singolo**, con CTA verso la donazione.
+- **Pagina "Sostienici"**, hub verso donazione e candidatura volontari.
+- **Form di donazione** (simbolico — nessun pagamento reale, dichiarato in
+  pagina).
+- **Form candidatura volontari**, con validazione e protezione anti-spam; i
+  dati restano in un'area riservata, non pubblica.
+- **Homepage** con aree di intervento, progetti in evidenza, CTA.
+- **Menu responsive**: esteso su desktop, a comparsa su mobile.
+
+## Perché alcune scelte
+
+- **Niente numeri finti.** Il mockup originale prevedeva statistiche globali
+  inventate; le ho tolte perché con solo 6 progetti reali sarebbero state
+  fuori luogo. Il conteggio progetti per area, invece, è reale.
+- **Donazione dichiaratamente simbolica**, per trasparenza verso chi visita
+  il sito: un'integrazione di pagamento vera avrebbe richiesto conformità
+  PCI-DSS, fuori scopo per un progetto dimostrativo.
+- **JavaScript solo dove serve.** L'unico componente interattivo è il filtro
+  progetti: si appoggia a contenuto già renderizzato da WordPress e ne
+  mostra/nasconde pezzi, invece di richiedere di nuovo i dati — la pagina
+  resta utilizzabile anche senza JavaScript.
+- **Le candidature non sono contenuto pubblico** del sito: restano visibili
+  solo in bacheca amministrativa.
+
+## Sotto il cofano
+
+Per chi vuole vedere lo stack nel dettaglio:
+
+- **[Bedrock](https://roots.io/bedrock/)** — struttura WordPress gestita via
+  Composer, configurazione a variabili d'ambiente
+- **[Sage](https://roots.io/sage/) + [Acorn](https://roots.io/acorn/)** —
+  tema con Blade come motore di template e integrazione Laravel-style
+- **Tailwind CSS v4** — design tokens via `@theme`
+- **Vite** — build/dev server per gli asset del tema
+- **Vue 3** — componenti isolati montati su porzioni di pagina, non una SPA
+
+<details>
+<summary>Struttura del progetto</summary>
 
 ```
 web/app/themes/bluelabs-tema/
@@ -33,92 +72,8 @@ web/app/themes/bluelabs-tema/
 └── vite.config.js
 ```
 
-## Funzionalità
+</details>
 
-- **Custom Post Type "Progetto"** con tassonomia gerarchica **"Area di
-  intervento"** (Salute, Infanzia, Ambiente).
-- **Archivio progetti** (`/progetti/`) con **filtro per area** lato client:
-  il componente Vue `FiltroProgetti` non richiama una seconda volta i dati
-  via REST — le card sono già renderizzate da WordPress/Blade, così la
-  pagina resta funzionante anche senza JavaScript, e Vue si limita a
-  mostrare/nascondere le card già nel DOM in base all'area selezionata.
-- **Pagina singolo progetto** con immagine in evidenza, aree collegate e CTA
-  verso la donazione.
-- **Pagina "Sostienici"** come hub che rimanda a "Dona" e "Candidati come
-  volontario".
-- **Pagina "Dona"** — form simbolico (importo + metodo di pagamento). Non è
-  collegato a nessun gateway reale: lo dichiara esplicitamente in pagina,
-  sia per onestà verso chi visita il sito sia perché un'integrazione di
-  pagamento vera richiederebbe chiavi API e conformità PCI-DSS, fuori
-  scopo per un progetto dimostrativo.
-- **Pagina "Candidati come volontario"** — form reale che invia i dati a una
-  rotta REST custom (`POST /wp-json/bluelabs/v1/candidature`), con honeypot
-  anti-spam e validazione server-side. Ogni candidatura viene salvata come
-  CPT `candidatura` (`public => false`), visibile solo in bacheca WordPress:
-  non genera pagine pubbliche né passa dal REST core di WordPress, che
-  avrebbe richiesto un utente autenticato con permessi di scrittura.
-- **Homepage** con sezione aree di intervento, progetti in evidenza e CTA
-  dona/volontariato.
-- **Navigazione responsive**: menu desktop da `lg` in su, menu mobile a
-  comparsa (hamburger) sotto, con lo stesso menu WordPress renderizzato
-  server-side in entrambe le versioni.
+## Farlo girare in locale
 
-## Decisioni di progetto
-
-- **Niente statistiche finte.** Il mockup originale prevedeva una fascia con
-  numeri globali inventati (es. "128 progetti, 14 paesi"). È stata tolta:
-  con solo 6 progetti reali nel sito, mostrare cifre fittizie sopra
-  contenuti veri avrebbe reso il sito internamente incoerente. Il conteggio
-  progetti per area che si vede in homepage è invece reale (`get_terms`
-  con `count`).
-- **Form di donazione dichiaratamente simbolico**, per trasparenza verso chi
-  visita il sito piuttosto che simulare un pagamento reale.
-- **Vue solo dove serve**, non come framework applicativo: ogni componente
-  si monta su un elemento preciso del DOM già renderizzato da WordPress, per
-  restare il più vicino possibile a un sito "server-rendered" con
-  arricchimenti puntuali lato client.
-- **CPT "Candidatura" non pubblico**, con una rotta REST custom invece del
-  REST core: i dati delle candidature sono per chi gestisce la Fondazione,
-  non contenuto del sito.
-
-## Setup locale
-
-Prerequisiti: PHP ≥ 8.2, Composer, Node.js ≥ 20.19, un server MySQL/MariaDB
-locale (es. via Local, Laragon, DBngin...).
-
-```bash
-composer install
-cp .env.example .env
-```
-
-Nel file `.env` appena creato:
-
-- imposta `DB_NAME`, `DB_USER`, `DB_PASSWORD` (e se serve `DB_HOST`) per il
-  tuo database locale;
-- imposta `WP_HOME` e `WP_SITEURL` (in locale, `http://localhost:8000` e
-  `http://localhost:8000/wp`);
-- genera le chiavi di sicurezza su https://roots.io/salts.html e sostituisci
-  i valori `generateme`.
-
-Poi:
-
-```bash
-npm install
-npm run dev      # Vite dev server, porta 5173
-```
-
-Visita `http://localhost:8000/wp/wp-admin/` per completare l'installazione
-di WordPress (se il DB è vuoto) e attivare il tema `bluelabs-tema` da
-Aspetto → Temi.
-
-Per la build di produzione degli asset del tema:
-
-```bash
-npm run build
-```
-
-## Note
-
-Progetto dimostrativo, non pensato per essere messo online così com'è: il
-form di donazione non elabora pagamenti reali e i contenuti (progetti,
-aree, testi) sono di esempio.
+Istruzioni di setup complete in [SETUP.md](./SETUP.md).
