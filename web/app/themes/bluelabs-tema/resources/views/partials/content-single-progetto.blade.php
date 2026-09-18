@@ -9,7 +9,7 @@
 <article @php(post_class())>
   @if (has_post_thumbnail())
     <div class="aspect-[21/9] w-full overflow-hidden bg-bridge">
-      {!! get_the_post_thumbnail(get_the_ID(), 'large', ['class' => 'h-full w-full object-cover']) !!}
+      {!! get_the_post_thumbnail(get_the_ID(), 'large', ['class' => 'h-full w-full object-cover object-top']) !!}
     </div>
   @endif
 
