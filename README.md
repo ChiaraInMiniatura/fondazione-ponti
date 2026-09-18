@@ -1,50 +1,124 @@
-<p align="center">
-  <a href="https://roots.io/bedrock/">
-    <img alt="Bedrock" src="https://cdn.roots.io/app/uploads/logo-bedrock.svg" height="100">
-  </a>
-</p>
+# Fondazione Ponti
 
-<p align="center">
-  <a href="https://packagist.org/packages/roots/bedrock"><img alt="Packagist Installs" src="https://img.shields.io/packagist/dt/roots/bedrock?label=projects%20created&colorB=2b3072&colorA=525ddc&style=flat-square"></a>
-  <a href="https://packagist.org/packages/roots/wordpress"><img alt="roots/wordpress Packagist Downloads" src="https://img.shields.io/packagist/dt/roots/wordpress?label=roots%2Fwordpress%20downloads&logo=roots&logoColor=white&colorB=2b3072&colorA=525ddc&style=flat-square"></a>
-  <img src="https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/roots/bedrock/master/composer.json&label=wordpress&logo=roots&logoColor=white&query=$.require[%22roots/wordpress%22]&colorB=2b3072&colorA=525ddc&style=flat-square">
-  <a href="https://github.com/roots/bedrock/actions/workflows/ci.yml"><img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/roots/bedrock/ci.yml?branch=master&logo=github&label=CI&style=flat-square"></a>
-  <a href="https://twitter.com/rootswp"><img alt="Follow Roots" src="https://img.shields.io/badge/follow%20@rootswp-1da1f2?logo=twitter&logoColor=ffffff&message=&style=flat-square"></a>
-  <a href="https://github.com/sponsors/roots"><img src="https://img.shields.io/badge/sponsor%20roots-525ddc?logo=github&style=flat-square&logoColor=ffffff&message=" alt="Sponsor Roots"></a>
-</p>
+Sito WordPress per **Fondazione Ponti**, una fondazione umanitaria fittizia
+(Napoli). È un progetto di pratica personale, costruito per allenarmi su uno
+stack WordPress moderno prima di un incarico vero per un'agenzia — non è un
+sito in produzione e non ha uno scopo commerciale reale.
 
-<p align="center">WordPress boilerplate with Composer, easier configuration, and an improved folder structure</p>
+## Stack
 
-<p align="center">
-  <a href="https://roots.io/bedrock/">Website</a> &nbsp;&nbsp; <a href="https://roots.io/bedrock/docs/installation/">Documentation</a> &nbsp;&nbsp; <a href="https://github.com/roots/bedrock/releases">Releases</a> &nbsp;&nbsp; <a href="https://discourse.roots.io/">Community</a>
-</p>
+- **[Bedrock](https://roots.io/bedrock/)** — struttura WordPress moderna, gestita via Composer, con configurazione a variabili d'ambiente
+- **[Sage](https://roots.io/sage/) + [Acorn](https://roots.io/acorn/)** — tema con Blade come motore di template e integrazione Laravel-style
+- **Blade** — template del tema
+- **Tailwind CSS v4** — design system a token via `@theme` (colori, font, ombre), utility classes
+- **Vite** — build/dev server per asset CSS/JS del tema
+- **Vue 3** — componenti isolati montati su porzioni specifiche di pagina (niente SPA: il resto è HTML renderizzato da WordPress/Blade)
 
-## Support us
+## Struttura del progetto
 
-We're dedicated to pushing modern WordPress development forward through our open source projects, and we need your support to keep building. You can support our work by purchasing [Radicle](https://roots.io/radicle/), our recommended WordPress stack, or by [sponsoring us on GitHub](https://github.com/sponsors/roots). Every contribution directly helps us create better tools for the WordPress ecosystem.
+```
+web/app/themes/bluelabs-tema/
+├── app/                        # PHP del tema (namespace App\)
+│   ├── setup.php                # Bootstrap Sage/Acorn, nav menu, supporti tema
+│   ├── cpt.php                  # CPT "Progetto" + tassonomia "Area di intervento"
+│   ├── candidature.php          # CPT "Candidatura" + rotta REST custom per il form volontari
+│   └── filters.php
+├── resources/
+│   ├── views/                   # Template Blade (layout, pagine, partial)
+│   ├── js/
+│   │   ├── app.js                # Entry Vite, monta i componenti Vue sui loro mount point
+│   │   └── components/
+│   │       └── FiltroProgetti.vue
+│   └── css/app.css              # Design tokens Tailwind v4 (@theme)
+└── vite.config.js
+```
 
-### Sponsors
+## Funzionalità
 
-<a href="https://carrot.com/"><img src="https://cdn.roots.io/app/uploads/carrot.svg" alt="Carrot" width="120" height="90"></a> <a href="https://wordpress.com/"><img src="https://cdn.roots.io/app/uploads/wordpress.svg" alt="WordPress.com" width="120" height="90"></a> <a href="https://www.itineris.co.uk/"><img src="https://cdn.roots.io/app/uploads/itineris.svg" alt="Itineris" width="120" height="90"></a> <a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="120" height="90"></a>
+- **Custom Post Type "Progetto"** con tassonomia gerarchica **"Area di
+  intervento"** (Salute, Infanzia, Ambiente).
+- **Archivio progetti** (`/progetti/`) con **filtro per area** lato client:
+  il componente Vue `FiltroProgetti` non richiama una seconda volta i dati
+  via REST — le card sono già renderizzate da WordPress/Blade, così la
+  pagina resta funzionante anche senza JavaScript, e Vue si limita a
+  mostrare/nascondere le card già nel DOM in base all'area selezionata.
+- **Pagina singolo progetto** con immagine in evidenza, aree collegate e CTA
+  verso la donazione.
+- **Pagina "Sostienici"** come hub che rimanda a "Dona" e "Candidati come
+  volontario".
+- **Pagina "Dona"** — form simbolico (importo + metodo di pagamento). Non è
+  collegato a nessun gateway reale: lo dichiara esplicitamente in pagina,
+  sia per onestà verso chi visita il sito sia perché un'integrazione di
+  pagamento vera richiederebbe chiavi API e conformità PCI-DSS, fuori
+  scopo per un progetto dimostrativo.
+- **Pagina "Candidati come volontario"** — form reale che invia i dati a una
+  rotta REST custom (`POST /wp-json/bluelabs/v1/candidature`), con honeypot
+  anti-spam e validazione server-side. Ogni candidatura viene salvata come
+  CPT `candidatura` (`public => false`), visibile solo in bacheca WordPress:
+  non genera pagine pubbliche né passa dal REST core di WordPress, che
+  avrebbe richiesto un utente autenticato con permessi di scrittura.
+- **Homepage** con sezione aree di intervento, progetti in evidenza e CTA
+  dona/volontariato.
+- **Navigazione responsive**: menu desktop da `lg` in su, menu mobile a
+  comparsa (hamburger) sotto, con lo stesso menu WordPress renderizzato
+  server-side in entrambe le versioni.
 
-## Overview
+## Decisioni di progetto
 
-Bedrock is a WordPress boilerplate for developers that want to manage their projects with Git and Composer. Much of the philosophy behind Bedrock is inspired by the [Twelve-Factor App](http://12factor.net/) methodology, including the [WordPress specific version](https://roots.io/twelve-factor-wordpress/).
+- **Niente statistiche finte.** Il mockup originale prevedeva una fascia con
+  numeri globali inventati (es. "128 progetti, 14 paesi"). È stata tolta:
+  con solo 6 progetti reali nel sito, mostrare cifre fittizie sopra
+  contenuti veri avrebbe reso il sito internamente incoerente. Il conteggio
+  progetti per area che si vede in homepage è invece reale (`get_terms`
+  con `count`).
+- **Form di donazione dichiaratamente simbolico**, per trasparenza verso chi
+  visita il sito piuttosto che simulare un pagamento reale.
+- **Vue solo dove serve**, non come framework applicativo: ogni componente
+  si monta su un elemento preciso del DOM già renderizzato da WordPress, per
+  restare il più vicino possibile a un sito "server-rendered" con
+  arricchimenti puntuali lato client.
+- **CPT "Candidatura" non pubblico**, con una rotta REST custom invece del
+  REST core: i dati delle candidature sono per chi gestisce la Fondazione,
+  non contenuto del sito.
 
-- Better folder structure
-- Dependency management with [Composer](https://getcomposer.org)
-- Easy WordPress configuration with environment specific files
-- Environment variables with [Dotenv](https://github.com/vlucas/phpdotenv)
-- Autoloader for mu-plugins (use regular plugins as mu-plugins)
+## Setup locale
 
-## Getting Started
+Prerequisiti: PHP ≥ 8.2, Composer, Node.js ≥ 20.19, un server MySQL/MariaDB
+locale (es. via Local, Laragon, DBngin...).
 
-See the [Bedrock installation documentation](https://roots.io/bedrock/docs/installation/).
+```bash
+composer install
+cp .env.example .env
+```
 
-## Stay Connected
+Nel file `.env` appena creato:
 
-- Join us on Discord by [sponsoring us on GitHub](https://github.com/sponsors/roots)
-- Participate on [Roots Discourse](https://discourse.roots.io/)
-- Follow [@rootswp on Twitter](https://twitter.com/rootswp)
-- Read the [Roots Blog](https://roots.io/blog/)
-- Subscribe to the [Roots Newsletter](https://roots.io/newsletter/)
+- imposta `DB_NAME`, `DB_USER`, `DB_PASSWORD` (e se serve `DB_HOST`) per il
+  tuo database locale;
+- imposta `WP_HOME` e `WP_SITEURL` (in locale, `http://localhost:8000` e
+  `http://localhost:8000/wp`);
+- genera le chiavi di sicurezza su https://roots.io/salts.html e sostituisci
+  i valori `generateme`.
+
+Poi:
+
+```bash
+npm install
+npm run dev      # Vite dev server, porta 5173
+```
+
+Visita `http://localhost:8000/wp/wp-admin/` per completare l'installazione
+di WordPress (se il DB è vuoto) e attivare il tema `bluelabs-tema` da
+Aspetto → Temi.
+
+Per la build di produzione degli asset del tema:
+
+```bash
+npm run build
+```
+
+## Note
+
+Progetto dimostrativo, non pensato per essere messo online così com'è: il
+form di donazione non elabora pagamenti reali e i contenuti (progetti,
+aree, testi) sono di esempio.

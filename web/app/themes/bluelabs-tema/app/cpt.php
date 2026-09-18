@@ -50,7 +50,7 @@ add_action('init', function () {
  * Registra la tassonomia "Area di intervento", collegata a "Progetto".
  *
  * Termini previsti (da creare da wp-admin > Progetti > Aree di intervento):
- * Sanità, Istruzione, Emergenza, Ambiente.
+ * Salute, Infanzia, Ambiente.
  *
  * @return void
  */
