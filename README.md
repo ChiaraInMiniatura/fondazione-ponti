@@ -10,7 +10,20 @@ Sito per una fondazione umanitaria fittizia (Napoli). Progetto di pratica
 personale, costruito per allenarmi prima di un incarico vero per un'agenzia:
 non è online, non ha uno scopo commerciale reale.
 
-<!-- screenshot / GIF della homepage e del filtro progetti qui -->
+![Homepage](./docs/screenshots/homepage-hero.jpg)
+![Progetti in evidenza](./docs/screenshots/progetti-in-evidenza.jpg)
+![Archivio progetti con filtro per area](./docs/screenshots/archivio-filtro-ambiente.jpg)
+
+<details>
+<summary>Vista mobile</summary>
+
+<p>
+  <img src="./docs/screenshots/mobile-homepage.png" width="220" alt="Homepage su mobile">
+  <img src="./docs/screenshots/mobile-progetti-in-evidenza.png" width="220" alt="Progetti in evidenza su mobile">
+  <img src="./docs/screenshots/mobile-archivio-filtro.png" width="220" alt="Archivio con filtro su mobile">
+</p>
+
+</details>
 
 ## Cosa fa
 
@@ -51,28 +64,6 @@ Per chi vuole vedere lo stack nel dettaglio:
 - **Tailwind CSS v4** — design tokens via `@theme`
 - **Vite** — build/dev server per gli asset del tema
 - **Vue 3** — componenti isolati montati su porzioni di pagina, non una SPA
-
-<details>
-<summary>Struttura del progetto</summary>
-
-```
-web/app/themes/bluelabs-tema/
-├── app/                        # PHP del tema (namespace App\)
-│   ├── setup.php                # Bootstrap Sage/Acorn, nav menu, supporti tema
-│   ├── cpt.php                  # CPT "Progetto" + tassonomia "Area di intervento"
-│   ├── candidature.php          # CPT "Candidatura" + rotta REST custom per il form volontari
-│   └── filters.php
-├── resources/
-│   ├── views/                   # Template Blade (layout, pagine, partial)
-│   ├── js/
-│   │   ├── app.js                # Entry Vite, monta i componenti Vue sui loro mount point
-│   │   └── components/
-│   │       └── FiltroProgetti.vue
-│   └── css/app.css              # Design tokens Tailwind v4 (@theme)
-└── vite.config.js
-```
-
-</details>
 
 ## Farlo girare in locale
 

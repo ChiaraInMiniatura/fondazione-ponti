@@ -4,9 +4,9 @@
     il componente Vue del filtro.
 --}}
 @php
-  $aree = get_the_terms(get_the_ID(), 'area_intervento');
-  $aree = (! empty($aree) && ! is_wp_error($aree)) ? $aree : [];
-  $area_principale = $aree[0] ?? null;
+    $aree = get_the_terms(get_the_ID(), 'area_intervento');
+    $aree = (! empty($aree) && ! is_wp_error($aree)) ? $aree : [];
+    $area_principale = $aree[0] ?? null;
 @endphp
 
 <article
@@ -31,7 +31,7 @@
     </h3>
 
     <div class="text-sm leading-relaxed text-muted">
-      {{ get_the_excerpt() }}
+      {!! get_the_excerpt() !!}
     </div>
 
     <a href="{{ get_permalink() }}" class="mt-2.5 inline-flex items-center gap-1.5 text-sm font-semibold text-bridge">
